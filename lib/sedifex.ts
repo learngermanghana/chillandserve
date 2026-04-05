@@ -14,11 +14,17 @@ function getEnv() {
 
 function normalizeArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
+
   if (value && typeof value === "object") {
-    const maybeArray = (value as { data?: unknown; items?: unknown }).data ??
-      (value as { data?: unknown; items?: unknown }).items;
-    if (Array.isArray(maybeArray)) return maybeArray as T[];
+    const container = value as { data?: unknown; items?: unknown };
+    const maybeNested = container.data ?? container.items;
+
+    if (Array.isArray(maybeNested)) return maybeNested as T[];
+    if (maybeNested && typeof maybeNested === "object") return [maybeNested as T];
+
+    return [value as T];
   }
+
   return [];
 }
 
