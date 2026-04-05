@@ -11,16 +11,16 @@ export default function Footer() {
         </div>
 
         <nav className="flex flex-wrap gap-4 text-sm text-white/90">
-          <Link href="#home" className="hover:text-goldBrand">
+          <Link href="/" className="hover:text-goldBrand">
             Home
           </Link>
-          <Link href="#services" className="hover:text-goldBrand">
+          <Link href="/services" className="hover:text-goldBrand">
             Services
           </Link>
-          <Link href="#gallery" className="hover:text-goldBrand">
+          <Link href="/gallery" className="hover:text-goldBrand">
             Gallery
           </Link>
-          <Link href="#contact" className="hover:text-goldBrand">
+          <Link href="/contact" className="hover:text-goldBrand">
             Contact
           </Link>
         </nav>
