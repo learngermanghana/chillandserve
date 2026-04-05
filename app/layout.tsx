@@ -8,9 +8,9 @@ const siteUrl = "https://www.chillandserveghana.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: `${BRAND_NAME} | Premium Party & Event Service in Ghana`,
+  title: `${BRAND_NAME} | Premium Drinks, Cocktail & Event Service in Accra, Ghana`,
   description:
-    "Chill and Serve Ghana provides premium drinks service, chilling service, cocktail service, and professional waiters for weddings, birthdays, receptions, and private events in Ghana.",
+    "Chill and Serve Ghana is an Accra-based event drinks company serving Ghana with premium cocktail bartending, chilling service, and professional waiters for weddings, birthdays, receptions, and corporate events.",
   keywords: SEO_KEYWORDS,
   alternates: {
     canonical: "/"
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     }
   },
   openGraph: {
-    title: `${BRAND_NAME} | Premium Party & Event Service in Ghana`,
+    title: `${BRAND_NAME} | Accra, Ghana Event Drinks & Cocktail Service`,
     description:
-      "Elegant drinks and event support for weddings, receptions, birthdays, and private parties in Ghana.",
+      "Accra-based drinks and event service for weddings, receptions, birthdays, and corporate events across Ghana.",
     url: siteUrl,
     siteName: BRAND_NAME,
     locale: "en_GH",
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${BRAND_NAME} | Premium Party & Event Service in Ghana`,
+    title: `${BRAND_NAME} | Event Drinks & Cocktail Service in Accra, Ghana`,
     description:
-      "Book premium drinks service, chilling support, cocktail service, and professional waiters for your next event in Ghana."
+      "Book an Accra-based drinks and cocktail team for weddings, parties, and corporate events across Ghana."
   }
 };
 

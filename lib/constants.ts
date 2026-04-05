@@ -18,11 +18,14 @@ export const FALLBACK_HERO_IMAGE =
 export const SEO_KEYWORDS = [
   "Chill and Serve Ghana",
   "party service in Ghana",
+  "Accra event drinks service",
+  "event drinks service in Ghana",
   "drinks service in Accra",
   "chilling service Ghana",
   "cocktail service Ghana",
+  "mobile bar service Accra",
   "wedding drinks service Ghana",
   "professional waiters for events in Ghana",
-  "event drinks service Ghana",
-  "party waiters Accra"
+  "party waiters Accra",
+  "corporate event drinks Ghana"
 ];
