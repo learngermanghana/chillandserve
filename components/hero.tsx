@@ -19,37 +19,37 @@ export default function Hero({ promo, heroImage }: HeroProps) {
   return (
     <section id="home" className="relative overflow-hidden bg-ivoryBrand">
       <div className="absolute inset-0 bg-gradient-to-br from-emeraldBrand/5 via-transparent to-goldBrand/5" />
-      <div className="container mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:px-8 md:py-24">
+      <div className="container mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:gap-10 sm:py-14 md:grid-cols-2 md:px-8 md:py-24">
         <div className="relative z-10 flex flex-col justify-center">
           <p className="mb-4 inline-flex w-fit rounded-full bg-emeraldBrand/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emeraldBrand">
             {promo?.displayName || promo?.name || BRAND_NAME}
           </p>
-          <h1 className="text-4xl font-bold leading-tight text-charcoalBrand md:text-5xl">{headline}</h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-charcoalBrand/80 md:text-lg">{summary}</p>
+          <h1 className="text-3xl font-bold leading-tight text-charcoalBrand sm:text-4xl md:text-5xl">{headline}</h1>
+          <p className="mt-5 max-w-xl text-sm leading-relaxed text-charcoalBrand/80 sm:mt-6 sm:text-base md:text-lg">{summary}</p>
 
           {promoDate ? (
-            <p className="mt-5 inline-flex w-fit rounded-full border border-goldBrand/60 bg-goldBrand/15 px-3 py-1 text-sm text-charcoalBrand">
+            <p className="mt-4 inline-flex w-fit rounded-full border border-goldBrand/60 bg-goldBrand/15 px-3 py-1 text-xs text-charcoalBrand sm:mt-5 sm:text-sm">
               Limited Promo: {promoDate}
             </p>
           ) : null}
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="mt-7 flex flex-col items-stretch gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <Link
               href={WHATSAPP_LINK}
-              className="rounded-full bg-emeraldBrand px-6 py-3 text-sm font-semibold text-white shadow-premium transition hover:bg-emeraldBrand/90"
+              className="rounded-full bg-emeraldBrand px-6 py-3 text-center text-sm font-semibold text-white shadow-premium transition hover:bg-emeraldBrand/90"
             >
               Book on WhatsApp
             </Link>
             <Link
               href={PHONE_LINK}
-              className="rounded-full border border-emeraldBrand/30 bg-white px-6 py-3 text-sm font-semibold text-emeraldBrand transition hover:border-emeraldBrand hover:bg-emeraldBrand/5"
+              className="rounded-full border border-emeraldBrand/30 bg-white px-6 py-3 text-center text-sm font-semibold text-emeraldBrand transition hover:border-emeraldBrand hover:bg-emeraldBrand/5"
             >
               Call {PHONE_DISPLAY}
             </Link>
           </div>
         </div>
 
-        <div className="relative h-[320px] overflow-hidden rounded-3xl shadow-premium md:h-[520px]">
+        <div className="relative h-[260px] overflow-hidden rounded-3xl shadow-premium sm:h-[320px] md:h-[520px]">
           <Image
             src={heroImage.src}
             alt={heroImage.alt}
