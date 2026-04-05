@@ -8,7 +8,8 @@ const navItems = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/contact", label: "Contact" }
+  { href: "/contact", label: "Contact" },
+  { href: "/request-quote", label: "Request a Quote" }
 ];
 
 export default function SiteHeader() {
