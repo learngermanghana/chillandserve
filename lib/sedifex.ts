@@ -15,14 +15,16 @@ function getEnv() {
 function normalizeArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
   if (value && typeof value === "object") {
-    const maybeArray = (value as { data?: unknown; items?: unknown }).data ??
-      (value as { data?: unknown; items?: unknown }).items;
+    const maybeArray = (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).data ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).items ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).products ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).gallery;
     if (Array.isArray(maybeArray)) return maybeArray as T[];
   }
   return [];
 }
 
-async function fetchSedifexEndpoint<T>(path: string): Promise<T[]> {
+async function fetchSedifexEndpoint(path: string): Promise<unknown> {
   const { baseUrl, integrationKey } = getEnv();
 
   if (!baseUrl || !integrationKey) {
@@ -41,8 +43,29 @@ async function fetchSedifexEndpoint<T>(path: string): Promise<T[]> {
     throw new Error(`Sedifex fetch failed: ${response.status}`);
   }
 
-  const json = (await response.json()) as unknown;
-  return normalizeArray<T>(json);
+  return (await response.json()) as unknown;
+}
+
+function normalizePromo(value: unknown): SedifexPromo | null {
+  if (!value || typeof value !== "object") return null;
+
+  if (Array.isArray(value)) {
+    return (value[0] as SedifexPromo | undefined) ?? null;
+  }
+
+  const source = value as {
+    promo?: unknown;
+    data?: unknown;
+    item?: unknown;
+    profile?: unknown;
+  };
+  const candidate = source.promo ?? source.data ?? source.item ?? source.profile ?? value;
+
+  if (candidate && typeof candidate === "object" && !Array.isArray(candidate)) {
+    return candidate as SedifexPromo;
+  }
+
+  return null;
 }
 
 function dedupeProducts(products: SedifexProduct[]): SedifexProduct[] {
@@ -76,15 +99,15 @@ export async function getHomePageData(): Promise<HomePageData> {
   }
 
   try {
-    const [productsRaw, promoRaw, galleryRaw] = await Promise.all([
-      fetchSedifexEndpoint<SedifexProduct>(`/integrationProducts?storeId=${storeId}`),
-      fetchSedifexEndpoint<SedifexPromo>(`/integrationPromo?storeId=${storeId}`),
-      fetchSedifexEndpoint<SedifexGalleryItem>(`/integrationGallery?storeId=${storeId}`)
+    const [productsResponse, promoResponse, galleryResponse] = await Promise.all([
+      fetchSedifexEndpoint(`/integrationProducts?storeId=${storeId}`),
+      fetchSedifexEndpoint(`/integrationPromo?storeId=${storeId}`),
+      fetchSedifexEndpoint(`/integrationGallery?storeId=${storeId}`)
     ]);
 
-    const products = dedupeProducts(productsRaw);
-    const promo = promoRaw[0] ?? null;
-    const gallery = normalizeGallery(galleryRaw);
+    const products = dedupeProducts(normalizeArray<SedifexProduct>(productsResponse));
+    const promo = normalizePromo(promoResponse);
+    const gallery = normalizeGallery(normalizeArray<SedifexGalleryItem>(galleryResponse));
 
     return {
       products: products.length ? products : fallbackProducts,
