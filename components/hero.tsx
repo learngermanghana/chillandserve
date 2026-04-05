@@ -11,10 +11,10 @@ interface HeroProps {
 
 export default function Hero({ promo, heroImage }: HeroProps) {
   const promoDate = formatDateRange(promo?.promoStartDate, promo?.promoEndDate);
-  const headline = promo?.promoTitle || "Premium Drinks & Event Service for Ghana's Best Celebrations";
+  const headline = promo?.promoTitle || "Accra's Premium Drinks & Event Service for Celebrations Across Ghana";
   const summary =
     promo?.promoSummary ||
-    "From weddings to private parties, Chill and Serve Ghana delivers stylish drinks service, chilling support, and refined guest experience.";
+    "Based in Accra, Chill and Serve Ghana delivers stylish drinks service, chilling support, and refined guest experiences for weddings, private parties, and corporate events nationwide.";
 
   return (
     <section id="home" className="relative overflow-hidden bg-ivoryBrand">
