@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { BRAND_NAME, SEO_KEYWORDS } from "@/lib/constants";
-
+import Footer from "@/components/footer";
+import SiteHeader from "@/components/site-header";
 
 export const metadata: Metadata = {
   title: `${BRAND_NAME} | Premium Party & Event Service in Ghana`,
@@ -31,7 +32,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-ivoryBrand text-charcoalBrand antialiased">{children}</body>
+      <body className="bg-ivoryBrand text-charcoalBrand antialiased">
+        <SiteHeader />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }
