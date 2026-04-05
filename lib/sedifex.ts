@@ -22,14 +22,23 @@ function normalizeArray<T>(value: unknown): T[] {
   return [];
 }
 
-async function fetchSedifexEndpoint<T>(path: string): Promise<T[]> {
+async function fetchSedifexEndpoint<T>(
+  path: string,
+  queryParams?: Record<string, string>
+): Promise<T[]> {
   const { baseUrl, integrationKey } = getEnv();
 
   if (!baseUrl || !integrationKey) {
     throw new Error("Missing Sedifex environment configuration.");
   }
 
-  const response = await fetch(`${baseUrl}${path}`, {
+  const endpointUrl = new URL(path, baseUrl);
+  if (queryParams) {
+    const searchParams = new URLSearchParams(queryParams);
+    endpointUrl.search = searchParams.toString();
+  }
+
+  const response = await fetch(endpointUrl, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${integrationKey}`
@@ -77,9 +86,9 @@ export async function getHomePageData(): Promise<HomePageData> {
 
   try {
     const [productsRaw, promoRaw, galleryRaw] = await Promise.all([
-      fetchSedifexEndpoint<SedifexProduct>(`/integrationProducts?storeId=${storeId}`),
-      fetchSedifexEndpoint<SedifexPromo>(`/integrationPromo?storeId=${storeId}`),
-      fetchSedifexEndpoint<SedifexGalleryItem>(`/integrationGallery?storeId=${storeId}`)
+      fetchSedifexEndpoint<SedifexProduct>("/integrationProducts", { storeId }),
+      fetchSedifexEndpoint<SedifexPromo>("/integrationPromo", { storeId }),
+      fetchSedifexEndpoint<SedifexGalleryItem>("/integrationGallery", { storeId })
     ]);
 
     const products = dedupeProducts(productsRaw);
