@@ -17,6 +17,7 @@ Create a `.env.local` file in the project root:
 SEDIFEX_API_BASE_URL=
 SEDIFEX_STORE_ID=
 SEDIFEX_INTEGRATION_KEY=
+NEXT_PUBLIC_SITE_URL=
 ```
 
 ## Local Development
@@ -50,6 +51,7 @@ npm run start
    - `SEDIFEX_API_BASE_URL`
    - `SEDIFEX_STORE_ID`
    - `SEDIFEX_INTEGRATION_KEY`
+   - `NEXT_PUBLIC_SITE_URL`
 4. Deploy.
 
 ## Sedifex Data Integration
