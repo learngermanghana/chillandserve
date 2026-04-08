@@ -12,6 +12,10 @@ function getEnv() {
   };
 }
 
+function cleanBaseUrl(baseUrl: string): string {
+  return baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+}
+
 function normalizeArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
   if (value && typeof value === "object") {
@@ -31,10 +35,11 @@ async function fetchSedifexEndpoint(path: string): Promise<unknown> {
     throw new Error("Missing Sedifex environment configuration.");
   }
 
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(`${cleanBaseUrl(baseUrl)}${path}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${integrationKey}`
+      Authorization: `Bearer ${integrationKey}`,
+      Accept: "application/json"
     },
     next: { revalidate: REVALIDATE_SECONDS }
   });
@@ -65,28 +70,52 @@ function normalizePromo(value: unknown): SedifexPromo | null {
     if (typeof current !== "object") continue;
 
     const record = current as Record<string, unknown>;
-    const promoFieldKeys: Array<keyof SedifexPromo> = [
-      "promoTitle",
-      "promoSummary",
-      "promoStartDate",
-      "promoEndDate",
-      "promoSlug",
-      "promoWebsiteUrl",
-      "promoYoutubeChannelId"
-    ];
-    const hasPromoFields = promoFieldKeys.some((key) => typeof record[key] === "string" && record[key]);
+    const promoTitle = typeof record.promoTitle === "string" ? record.promoTitle : typeof record.promo_title === "string" ? record.promo_title : undefined;
+    const promoSummary =
+      typeof record.promoSummary === "string" ? record.promoSummary : typeof record.promo_summary === "string" ? record.promo_summary : undefined;
+    const promoStartDate =
+      typeof record.promoStartDate === "string"
+        ? record.promoStartDate
+        : typeof record.promo_start_date === "string"
+          ? record.promo_start_date
+          : undefined;
+    const promoEndDate =
+      typeof record.promoEndDate === "string"
+        ? record.promoEndDate
+        : typeof record.promo_end_date === "string"
+          ? record.promo_end_date
+          : undefined;
+    const promoSlug = typeof record.promoSlug === "string" ? record.promoSlug : typeof record.promo_slug === "string" ? record.promo_slug : undefined;
+    const promoWebsiteUrl =
+      typeof record.promoWebsiteUrl === "string"
+        ? record.promoWebsiteUrl
+        : typeof record.promo_website_url === "string"
+          ? record.promo_website_url
+          : undefined;
+    const promoYoutubeChannelId =
+      typeof record.promoYoutubeChannelId === "string"
+        ? record.promoYoutubeChannelId
+        : typeof record.promo_youtube_channel_id === "string"
+          ? record.promo_youtube_channel_id
+          : undefined;
+    const displayName =
+      typeof record.displayName === "string" ? record.displayName : typeof record.display_name === "string" ? record.display_name : undefined;
+    const name = typeof record.name === "string" ? record.name : undefined;
+    const hasPromoFields = Boolean(
+      promoTitle || promoSummary || promoStartDate || promoEndDate || promoSlug || promoWebsiteUrl || promoYoutubeChannelId
+    );
 
     if (hasPromoFields) {
       return {
-        promoTitle: typeof record.promoTitle === "string" ? record.promoTitle : undefined,
-        promoSummary: typeof record.promoSummary === "string" ? record.promoSummary : undefined,
-        promoStartDate: typeof record.promoStartDate === "string" ? record.promoStartDate : undefined,
-        promoEndDate: typeof record.promoEndDate === "string" ? record.promoEndDate : undefined,
-        promoSlug: typeof record.promoSlug === "string" ? record.promoSlug : undefined,
-        promoWebsiteUrl: typeof record.promoWebsiteUrl === "string" ? record.promoWebsiteUrl : undefined,
-        promoYoutubeChannelId: typeof record.promoYoutubeChannelId === "string" ? record.promoYoutubeChannelId : undefined,
-        displayName: typeof record.displayName === "string" ? record.displayName : undefined,
-        name: typeof record.name === "string" ? record.name : undefined
+        promoTitle,
+        promoSummary,
+        promoStartDate,
+        promoEndDate,
+        promoSlug,
+        promoWebsiteUrl,
+        promoYoutubeChannelId,
+        displayName,
+        name
       };
     }
 
@@ -130,11 +159,13 @@ export async function getHomePageData(): Promise<HomePageData> {
     };
   }
 
+  const encodedStoreId = encodeURIComponent(storeId);
+
   try {
     const [productsResponse, promoResponse, galleryResponse] = await Promise.all([
-      fetchSedifexEndpoint(`/integrationProducts?storeId=${storeId}`),
-      fetchSedifexEndpoint(`/integrationPromo?storeId=${storeId}`),
-      fetchSedifexEndpoint(`/integrationGallery?storeId=${storeId}`)
+      fetchSedifexEndpoint(`/integrationProducts?storeId=${encodedStoreId}`),
+      fetchSedifexEndpoint(`/integrationPromo?storeId=${encodedStoreId}`),
+      fetchSedifexEndpoint(`/integrationGallery?storeId=${encodedStoreId}`)
     ]);
 
     const products = dedupeProducts(normalizeArray<SedifexProduct>(productsResponse));
