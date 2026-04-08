@@ -82,6 +82,7 @@ export const fallbackPromo: SedifexPromo = {
   promoStartDate: "2026-01-01",
   promoEndDate: "2026-12-31",
   promoSlug: "premium-event-service",
+  promoYoutubeChannelId: "UCYP5OOSH4IzNUgyqmRNrw7Q",
   displayName: "Chill and Serve Ghana"
 };
 

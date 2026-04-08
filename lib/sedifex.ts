@@ -71,7 +71,8 @@ function normalizePromo(value: unknown): SedifexPromo | null {
       "promoStartDate",
       "promoEndDate",
       "promoSlug",
-      "promoWebsiteUrl"
+      "promoWebsiteUrl",
+      "promoYoutubeChannelId"
     ];
     const hasPromoFields = promoFieldKeys.some((key) => typeof record[key] === "string" && record[key]);
 
@@ -83,6 +84,7 @@ function normalizePromo(value: unknown): SedifexPromo | null {
         promoEndDate: typeof record.promoEndDate === "string" ? record.promoEndDate : undefined,
         promoSlug: typeof record.promoSlug === "string" ? record.promoSlug : undefined,
         promoWebsiteUrl: typeof record.promoWebsiteUrl === "string" ? record.promoWebsiteUrl : undefined,
+        promoYoutubeChannelId: typeof record.promoYoutubeChannelId === "string" ? record.promoYoutubeChannelId : undefined,
         displayName: typeof record.displayName === "string" ? record.displayName : undefined,
         name: typeof record.name === "string" ? record.name : undefined
       };
