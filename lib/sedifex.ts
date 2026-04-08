@@ -70,52 +70,31 @@ function normalizePromo(value: unknown): SedifexPromo | null {
     if (typeof current !== "object") continue;
 
     const record = current as Record<string, unknown>;
-    const promoTitle = typeof record.promoTitle === "string" ? record.promoTitle : typeof record.promo_title === "string" ? record.promo_title : undefined;
-    const promoSummary =
-      typeof record.promoSummary === "string" ? record.promoSummary : typeof record.promo_summary === "string" ? record.promo_summary : undefined;
-    const promoStartDate =
-      typeof record.promoStartDate === "string"
-        ? record.promoStartDate
-        : typeof record.promo_start_date === "string"
-          ? record.promo_start_date
-          : undefined;
-    const promoEndDate =
-      typeof record.promoEndDate === "string"
-        ? record.promoEndDate
-        : typeof record.promo_end_date === "string"
-          ? record.promo_end_date
-          : undefined;
-    const promoImageUrl =
-      typeof record.promoImageUrl === "string"
-        ? record.promoImageUrl
-        : typeof record.promo_image_url === "string"
-          ? record.promo_image_url
-          : undefined;
-    const promoImageAlt =
-      typeof record.promoImageAlt === "string"
-        ? record.promoImageAlt
-        : typeof record.promo_image_alt === "string"
-          ? record.promo_image_alt
-          : undefined;
-    const promoSlug = typeof record.promoSlug === "string" ? record.promoSlug : typeof record.promo_slug === "string" ? record.promo_slug : undefined;
-    const promoWebsiteUrl =
-      typeof record.promoWebsiteUrl === "string"
-        ? record.promoWebsiteUrl
-        : typeof record.promo_website_url === "string"
-          ? record.promo_website_url
-          : undefined;
-    const promoYoutubeChannelId =
-      typeof record.promoYoutubeChannelId === "string"
-        ? record.promoYoutubeChannelId
-        : typeof record.promo_youtube_channel_id === "string"
-          ? record.promo_youtube_channel_id
-          : undefined;
+    const pickString = (...keys: string[]): string | undefined => {
+      for (const key of keys) {
+        if (typeof record[key] === "string") return record[key] as string;
+      }
+      return undefined;
+    };
+
+    const promoTitle = pickString("promoTitle", "promo_title", "title", "name");
+    const promoSummary = pickString("promoSummary", "promo_summary", "summary", "description");
+    const promoStartDate = pickString("promoStartDate", "promo_start_date", "startDate", "start_date");
+    const promoEndDate = pickString("promoEndDate", "promo_end_date", "endDate", "end_date");
+    const promoImageUrl = pickString("promoImageUrl", "promo_image_url", "imageUrl", "image_url", "image");
+    const promoImageAlt = pickString("promoImageAlt", "promo_image_alt", "imageAlt", "image_alt");
+    const promoSlug = pickString("promoSlug", "promo_slug", "slug");
+    const promoWebsiteUrl = pickString("promoWebsiteUrl", "promo_website_url", "websiteUrl", "website_url", "url");
+    const promoYoutubeChannelId = pickString(
+      "promoYoutubeChannelId",
+      "promo_youtube_channel_id",
+      "youtubeChannelId",
+      "youtube_channel_id"
+    );
     const displayName =
       typeof record.displayName === "string" ? record.displayName : typeof record.display_name === "string" ? record.display_name : undefined;
     const name = typeof record.name === "string" ? record.name : undefined;
-    const hasPromoFields = Boolean(
-      promoTitle || promoSummary || promoStartDate || promoEndDate || promoImageUrl || promoSlug || promoWebsiteUrl || promoYoutubeChannelId
-    );
+    const hasPromoFields = Boolean(promoTitle || promoSummary || promoStartDate || promoEndDate || promoImageUrl || promoSlug || promoWebsiteUrl);
 
     if (hasPromoFields) {
       return {
