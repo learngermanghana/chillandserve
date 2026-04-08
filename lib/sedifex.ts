@@ -85,6 +85,18 @@ function normalizePromo(value: unknown): SedifexPromo | null {
         : typeof record.promo_end_date === "string"
           ? record.promo_end_date
           : undefined;
+    const promoImageUrl =
+      typeof record.promoImageUrl === "string"
+        ? record.promoImageUrl
+        : typeof record.promo_image_url === "string"
+          ? record.promo_image_url
+          : undefined;
+    const promoImageAlt =
+      typeof record.promoImageAlt === "string"
+        ? record.promoImageAlt
+        : typeof record.promo_image_alt === "string"
+          ? record.promo_image_alt
+          : undefined;
     const promoSlug = typeof record.promoSlug === "string" ? record.promoSlug : typeof record.promo_slug === "string" ? record.promo_slug : undefined;
     const promoWebsiteUrl =
       typeof record.promoWebsiteUrl === "string"
@@ -102,7 +114,7 @@ function normalizePromo(value: unknown): SedifexPromo | null {
       typeof record.displayName === "string" ? record.displayName : typeof record.display_name === "string" ? record.display_name : undefined;
     const name = typeof record.name === "string" ? record.name : undefined;
     const hasPromoFields = Boolean(
-      promoTitle || promoSummary || promoStartDate || promoEndDate || promoSlug || promoWebsiteUrl || promoYoutubeChannelId
+      promoTitle || promoSummary || promoStartDate || promoEndDate || promoImageUrl || promoSlug || promoWebsiteUrl || promoYoutubeChannelId
     );
 
     if (hasPromoFields) {
@@ -111,6 +123,8 @@ function normalizePromo(value: unknown): SedifexPromo | null {
         promoSummary,
         promoStartDate,
         promoEndDate,
+        promoImageUrl,
+        promoImageAlt,
         promoSlug,
         promoWebsiteUrl,
         promoYoutubeChannelId,
