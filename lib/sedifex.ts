@@ -49,20 +49,50 @@ async function fetchSedifexEndpoint(path: string): Promise<unknown> {
 function normalizePromo(value: unknown): SedifexPromo | null {
   if (!value || typeof value !== "object") return null;
 
-  if (Array.isArray(value)) {
-    return (value[0] as SedifexPromo | undefined) ?? null;
-  }
+  const queue: unknown[] = [value];
+  const visited = new Set<unknown>();
 
-  const source = value as {
-    promo?: unknown;
-    data?: unknown;
-    item?: unknown;
-    profile?: unknown;
-  };
-  const candidate = source.promo ?? source.data ?? source.item ?? source.profile ?? value;
+  while (queue.length) {
+    const current = queue.shift();
+    if (!current || visited.has(current)) continue;
+    visited.add(current);
 
-  if (candidate && typeof candidate === "object" && !Array.isArray(candidate)) {
-    return candidate as SedifexPromo;
+    if (Array.isArray(current)) {
+      queue.push(...current);
+      continue;
+    }
+
+    if (typeof current !== "object") continue;
+
+    const record = current as Record<string, unknown>;
+    const promoFieldKeys: Array<keyof SedifexPromo> = [
+      "promoTitle",
+      "promoSummary",
+      "promoStartDate",
+      "promoEndDate",
+      "promoSlug",
+      "promoWebsiteUrl"
+    ];
+    const hasPromoFields = promoFieldKeys.some((key) => typeof record[key] === "string" && record[key]);
+
+    if (hasPromoFields) {
+      return {
+        promoTitle: typeof record.promoTitle === "string" ? record.promoTitle : undefined,
+        promoSummary: typeof record.promoSummary === "string" ? record.promoSummary : undefined,
+        promoStartDate: typeof record.promoStartDate === "string" ? record.promoStartDate : undefined,
+        promoEndDate: typeof record.promoEndDate === "string" ? record.promoEndDate : undefined,
+        promoSlug: typeof record.promoSlug === "string" ? record.promoSlug : undefined,
+        promoWebsiteUrl: typeof record.promoWebsiteUrl === "string" ? record.promoWebsiteUrl : undefined,
+        displayName: typeof record.displayName === "string" ? record.displayName : undefined,
+        name: typeof record.name === "string" ? record.name : undefined
+      };
+    }
+
+    for (const nestedValue of Object.values(record)) {
+      if (nestedValue && typeof nestedValue === "object") {
+        queue.push(nestedValue);
+      }
+    }
   }
 
   return null;
