@@ -19,8 +19,16 @@ export interface SedifexPromo {
   promoEndDate?: string;
   promoSlug?: string;
   promoWebsiteUrl?: string;
+  promoYoutubeChannelId?: string;
   displayName?: string;
   name?: string;
+}
+
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  url: string;
+  publishedAt?: string;
 }
 
 export interface SedifexGalleryItem {
