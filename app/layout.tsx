@@ -3,8 +3,9 @@ import "./globals.css";
 import { BRAND_NAME, SEO_KEYWORDS } from "@/lib/constants";
 import Footer from "@/components/footer";
 import SiteHeader from "@/components/site-header";
+import { getSiteUrl } from "@/lib/site-url";
 
-const siteUrl = "https://www.chillandserveghana.com";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -12,9 +13,6 @@ export const metadata: Metadata = {
   description:
     "Chill and Serve Ghana is an Accra-based event drinks company serving Ghana with premium cocktail bartending, chilling service, and professional waiters for weddings, birthdays, receptions, and corporate events.",
   keywords: SEO_KEYWORDS,
-  alternates: {
-    canonical: "/"
-  },
   robots: {
     index: true,
     follow: true,
