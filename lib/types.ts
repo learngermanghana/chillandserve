@@ -17,6 +17,8 @@ export interface SedifexPromo {
   promoSummary?: string;
   promoStartDate?: string;
   promoEndDate?: string;
+  promoImageUrl?: string;
+  promoImageAlt?: string;
   promoSlug?: string;
   promoWebsiteUrl?: string;
   promoYoutubeChannelId?: string;
