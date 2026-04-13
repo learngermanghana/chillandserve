@@ -8,6 +8,7 @@ export default function Footer() {
         <div>
           <p className="text-lg font-semibold">{BRAND_NAME}</p>
           <p className="mt-2 text-sm text-white/70">© {new Date().getFullYear()} {BRAND_NAME}. All rights reserved.</p>
+          <p className="mt-1 text-sm text-white/70">Developed by Xenom IT Solutions, founders of Sedifex and Falowen App.</p>
         </div>
 
         <nav className="flex flex-wrap gap-4 text-sm text-white/90">
