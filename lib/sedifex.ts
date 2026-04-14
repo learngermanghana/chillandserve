@@ -19,10 +19,23 @@ function cleanBaseUrl(baseUrl: string): string {
 function normalizeArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
   if (value && typeof value === "object") {
-    const maybeArray = (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).data ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).items ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).products ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown }).gallery;
+    const maybeArray =
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .data ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .items ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .products ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .services ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .gallery ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .records ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .rows ??
+      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
+        .result;
     if (Array.isArray(maybeArray)) return maybeArray as T[];
   }
   return [];
@@ -82,6 +95,14 @@ function normalizePromo(value: unknown): SedifexPromo | null {
     const promoStartDate = pickString("promoStartDate", "promo_start_date", "startDate", "start_date");
     const promoEndDate = pickString("promoEndDate", "promo_end_date", "endDate", "end_date");
     const promoImageUrl = pickString("promoImageUrl", "promo_image_url", "imageUrl", "image_url", "image");
+    const nestedImage = record.image;
+    const nestedPromoImage = record.promoImage;
+    const nestedImageUrl =
+      typeof nestedImage === "object" && nestedImage && "url" in nestedImage && typeof nestedImage.url === "string"
+        ? nestedImage.url
+        : typeof nestedPromoImage === "object" && nestedPromoImage && "url" in nestedPromoImage && typeof nestedPromoImage.url === "string"
+          ? nestedPromoImage.url
+          : undefined;
     const promoImageAlt = pickString("promoImageAlt", "promo_image_alt", "imageAlt", "image_alt");
     const promoSlug = pickString("promoSlug", "promo_slug", "slug");
     const promoWebsiteUrl = pickString("promoWebsiteUrl", "promo_website_url", "websiteUrl", "website_url", "url");
@@ -94,7 +115,9 @@ function normalizePromo(value: unknown): SedifexPromo | null {
     const displayName =
       typeof record.displayName === "string" ? record.displayName : typeof record.display_name === "string" ? record.display_name : undefined;
     const name = typeof record.name === "string" ? record.name : undefined;
-    const hasPromoFields = Boolean(promoTitle || promoSummary || promoStartDate || promoEndDate || promoImageUrl || promoSlug || promoWebsiteUrl);
+    const hasPromoFields = Boolean(
+      promoTitle || promoSummary || promoStartDate || promoEndDate || promoImageUrl || nestedImageUrl || promoSlug || promoWebsiteUrl
+    );
 
     if (hasPromoFields) {
       return {
@@ -102,7 +125,7 @@ function normalizePromo(value: unknown): SedifexPromo | null {
         promoSummary,
         promoStartDate,
         promoEndDate,
-        promoImageUrl,
+        promoImageUrl: promoImageUrl ?? nestedImageUrl,
         promoImageAlt,
         promoSlug,
         promoWebsiteUrl,
@@ -122,6 +145,41 @@ function normalizePromo(value: unknown): SedifexPromo | null {
   return null;
 }
 
+function pickImageUrl(value: Record<string, unknown>): string | undefined {
+  const fromString = ["imageUrl", "image_url", "image", "url", "photo", "photoUrl", "photo_url"].find(
+    (key) => typeof value[key] === "string"
+  );
+  if (fromString) return value[fromString] as string;
+
+  const nested = value.image;
+  if (nested && typeof nested === "object" && "url" in nested && typeof nested.url === "string") {
+    return nested.url;
+  }
+  return undefined;
+}
+
+function normalizeProducts(products: SedifexProduct[]): SedifexProduct[] {
+  return products.map((product) => {
+    const source = product as unknown as Record<string, unknown>;
+    const normalizedImageUrl = product.imageUrl ?? pickImageUrl(source);
+    const normalizedImageAlt =
+      product.imageAlt ??
+      (typeof source.imageAlt === "string"
+        ? source.imageAlt
+        : typeof source.image_alt === "string"
+          ? source.image_alt
+          : typeof source.alt === "string"
+            ? source.alt
+            : undefined);
+
+    return {
+      ...product,
+      imageUrl: normalizedImageUrl,
+      imageAlt: normalizedImageAlt
+    };
+  });
+}
+
 function dedupeProducts(products: SedifexProduct[]): SedifexProduct[] {
   const seen = new Set<string>();
 
@@ -135,8 +193,32 @@ function dedupeProducts(products: SedifexProduct[]): SedifexProduct[] {
 
 function normalizeGallery(gallery: SedifexGalleryItem[]): SedifexGalleryItem[] {
   return gallery
+    .map((item) => {
+      const source = item as unknown as Record<string, unknown>;
+      return {
+        ...item,
+        url: item.url ?? pickImageUrl(source),
+        alt:
+          item.alt ??
+          (typeof source.imageAlt === "string"
+            ? source.imageAlt
+            : typeof source.image_alt === "string"
+              ? source.image_alt
+              : typeof source.altText === "string"
+                ? source.altText
+                : typeof source.alt_text === "string"
+                  ? source.alt_text
+                  : undefined)
+      };
+    })
     .filter((item) => item.url)
-    .filter((item) => (typeof item.isPublished === "boolean" ? item.isPublished : true))
+    .filter((item) =>
+      typeof item.isPublished === "boolean"
+        ? item.isPublished
+        : typeof (item as unknown as Record<string, unknown>).published === "boolean"
+          ? Boolean((item as unknown as Record<string, unknown>).published)
+          : true
+    )
     .sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
 }
 
@@ -161,7 +243,7 @@ export async function getHomePageData(): Promise<HomePageData> {
       fetchSedifexEndpoint(`/integrationGallery?storeId=${encodedStoreId}`)
     ]);
 
-    const products = dedupeProducts(normalizeArray<SedifexProduct>(productsResponse));
+    const products = dedupeProducts(normalizeProducts(normalizeArray<SedifexProduct>(productsResponse)));
     const promo = normalizePromo(promoResponse);
     const gallery = normalizeGallery(normalizeArray<SedifexGalleryItem>(galleryResponse));
 
