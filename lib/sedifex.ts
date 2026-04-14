@@ -18,6 +18,25 @@ function cleanBaseUrl(baseUrl: string): string {
   return baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
 }
 
+function normalizeAssetUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return undefined;
+
+  if (/^https?:\/\//i.test(trimmedValue)) return trimmedValue;
+  if (trimmedValue.startsWith("//")) return `https:${trimmedValue}`;
+
+  const { baseUrl } = getEnv();
+  if (!baseUrl) return trimmedValue;
+
+  try {
+    return new URL(trimmedValue, `${cleanBaseUrl(baseUrl)}/`).toString();
+  } catch {
+    return trimmedValue;
+  }
+}
+
 function normalizeArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
   if (value && typeof value === "object") {
@@ -229,7 +248,7 @@ function normalizePromo(value: unknown): SedifexPromo | null {
         promoSummary,
         promoStartDate,
         promoEndDate,
-        promoImageUrl: promoImageUrl ?? nestedImageUrl,
+        promoImageUrl: normalizeAssetUrl(promoImageUrl ?? nestedImageUrl),
         promoImageAlt,
         promoSlug,
         promoWebsiteUrl,
@@ -265,7 +284,7 @@ function pickImageUrl(value: Record<string, unknown>): string | undefined {
 function normalizeProducts(products: SedifexProduct[]): SedifexProduct[] {
   return products.map((product) => {
     const source = product as unknown as Record<string, unknown>;
-    const normalizedImageUrl = product.imageUrl ?? pickImageUrl(source);
+    const normalizedImageUrl = normalizeAssetUrl(product.imageUrl ?? pickImageUrl(source));
     const normalizedImageUrls =
       Array.isArray(product.imageUrls) && product.imageUrls.length
         ? product.imageUrls
@@ -276,6 +295,9 @@ function normalizeProducts(products: SedifexProduct[]): SedifexProduct[] {
             : normalizedImageUrl
               ? [normalizedImageUrl]
               : [];
+    const mappedImageUrls = normalizedImageUrls
+      .map((imageUrl) => normalizeAssetUrl(imageUrl))
+      .filter((imageUrl): imageUrl is string => Boolean(imageUrl));
     const normalizedImageAlt =
       product.imageAlt ??
       (typeof source.imageAlt === "string"
@@ -290,7 +312,7 @@ function normalizeProducts(products: SedifexProduct[]): SedifexProduct[] {
       ...product,
       itemType: product.itemType ?? (typeof source.item_type === "string" ? source.item_type : undefined),
       imageUrl: normalizedImageUrl,
-      imageUrls: normalizedImageUrls,
+      imageUrls: mappedImageUrls,
       imageAlt: normalizedImageAlt
     };
   });
@@ -313,7 +335,7 @@ function normalizeGallery(gallery: SedifexGalleryItem[]): SedifexGalleryItem[] {
       const source = item as unknown as Record<string, unknown>;
       return {
         ...item,
-        url: item.url ?? pickImageUrl(source),
+        url: normalizeAssetUrl(item.url ?? pickImageUrl(source)),
         alt:
           item.alt ??
           (typeof source.imageAlt === "string"
