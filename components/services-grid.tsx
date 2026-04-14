@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import SectionHeading from "./section-heading";
 import { WHATSAPP_LINK } from "@/lib/constants";
@@ -27,12 +26,12 @@ export default function ServicesGrid({ products }: ServicesGridProps) {
               className="overflow-hidden rounded-3xl border border-charcoalBrand/5 bg-white shadow-premium"
             >
               <div className="relative h-52">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={product.imageUrl || "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=900&q=80"}
                   alt={product.imageAlt || `${product.name || "Service"} image`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
                 />
               </div>
               <div className="space-y-3 p-6">
