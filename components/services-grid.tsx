@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHeading from "./section-heading";
 import { WHATSAPP_LINK } from "@/lib/constants";
-import { formatCurrencyGHS } from "@/lib/format";
 import { SedifexProduct } from "@/lib/types";
 
 interface ServicesGridProps {
@@ -43,12 +42,11 @@ export default function ServicesGrid({ products }: ServicesGridProps) {
                   {product.description || "Tailored support designed for premium guest experience."}
                 </p>
                 <div className="flex items-center justify-between gap-3 border-t border-charcoalBrand/10 pt-4">
-                  <p className="font-semibold text-emeraldBrand">{formatCurrencyGHS(product.price)}</p>
                   <Link
                     href={WHATSAPP_LINK}
                     className="rounded-full border border-goldBrand/60 px-4 py-2 text-sm font-medium text-charcoalBrand transition hover:bg-goldBrand/20"
                   >
-                    Enquire
+                    Request Quote
                   </Link>
                 </div>
               </div>

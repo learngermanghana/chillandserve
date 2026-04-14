@@ -1,5 +1,6 @@
+import Link from "next/link";
 import SectionHeading from "./section-heading";
-import { formatCurrencyGHS } from "@/lib/format";
+import { WHATSAPP_LINK } from "@/lib/constants";
 import { SedifexProduct } from "@/lib/types";
 
 interface GroupedServicesProps {
@@ -27,7 +28,12 @@ export default function GroupedServices({ groups }: GroupedServicesProps) {
                     <p className="mt-1 text-sm text-charcoalBrand/70">
                       {item.description?.slice(0, 88) || "Premium support for elegant event hosting."}
                     </p>
-                    <p className="mt-2 text-sm font-semibold text-emeraldBrand">{formatCurrencyGHS(item.price)}</p>
+                    <Link
+                      href={WHATSAPP_LINK}
+                      className="mt-2 inline-flex rounded-full border border-goldBrand/60 px-3 py-1 text-xs font-medium text-charcoalBrand transition hover:bg-goldBrand/20"
+                    >
+                      Request Quote
+                    </Link>
                   </li>
                 ))}
               </ul>
