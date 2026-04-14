@@ -3,12 +3,14 @@ import { fallbackGallery, fallbackProducts, fallbackPromo } from "./fallback-dat
 import { HomePageData, SedifexGalleryItem, SedifexProduct, SedifexPromo } from "./types";
 
 const REVALIDATE_SECONDS = 60;
+const DEFAULT_CONTRACT_VERSION = "2026-04-13";
 
 function getEnv() {
   return {
     baseUrl: process.env.SEDIFEX_API_BASE_URL,
     storeId: process.env.SEDIFEX_STORE_ID,
-    integrationKey: process.env.SEDIFEX_INTEGRATION_KEY
+    integrationKey: process.env.SEDIFEX_INTEGRATION_API_KEY ?? process.env.SEDIFEX_INTEGRATION_KEY,
+    contractVersion: process.env.SEDIFEX_CONTRACT_VERSION ?? DEFAULT_CONTRACT_VERSION
   };
 }
 
@@ -20,29 +22,130 @@ function normalizeArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
   if (value && typeof value === "object") {
     const maybeArray =
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .data ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .items ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .products ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .services ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .gallery ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .records ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .rows ??
-      (value as { data?: unknown; items?: unknown; products?: unknown; gallery?: unknown; services?: unknown; records?: unknown; rows?: unknown; result?: unknown })
-        .result;
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).data ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).items ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).products ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).services ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).gallery ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).records ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).rows ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).topSelling ??
+      (
+        value as {
+          data?: unknown;
+          items?: unknown;
+          products?: unknown;
+          gallery?: unknown;
+          services?: unknown;
+          records?: unknown;
+          rows?: unknown;
+          result?: unknown;
+          topSelling?: unknown;
+        }
+      ).result;
     if (Array.isArray(maybeArray)) return maybeArray as T[];
   }
   return [];
 }
 
 async function fetchSedifexEndpoint(path: string): Promise<unknown> {
-  const { baseUrl, integrationKey } = getEnv();
+  const { baseUrl, integrationKey, contractVersion } = getEnv();
 
   if (!baseUrl || !integrationKey) {
     throw new Error("Missing Sedifex environment configuration.");
@@ -51,7 +154,8 @@ async function fetchSedifexEndpoint(path: string): Promise<unknown> {
   const response = await fetch(`${cleanBaseUrl(baseUrl)}${path}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${integrationKey}`,
+      "x-api-key": integrationKey,
+      "X-Sedifex-Contract-Version": contractVersion,
       Accept: "application/json"
     },
     next: { revalidate: REVALIDATE_SECONDS }
@@ -162,6 +266,16 @@ function normalizeProducts(products: SedifexProduct[]): SedifexProduct[] {
   return products.map((product) => {
     const source = product as unknown as Record<string, unknown>;
     const normalizedImageUrl = product.imageUrl ?? pickImageUrl(source);
+    const normalizedImageUrls =
+      Array.isArray(product.imageUrls) && product.imageUrls.length
+        ? product.imageUrls
+        : Array.isArray(source.imageUrls)
+          ? (source.imageUrls as string[])
+          : Array.isArray(source.image_urls)
+            ? (source.image_urls as string[])
+            : normalizedImageUrl
+              ? [normalizedImageUrl]
+              : [];
     const normalizedImageAlt =
       product.imageAlt ??
       (typeof source.imageAlt === "string"
@@ -174,7 +288,9 @@ function normalizeProducts(products: SedifexProduct[]): SedifexProduct[] {
 
     return {
       ...product,
+      itemType: product.itemType ?? (typeof source.item_type === "string" ? source.item_type : undefined),
       imageUrl: normalizedImageUrl,
+      imageUrls: normalizedImageUrls,
       imageAlt: normalizedImageAlt
     };
   });
@@ -222,6 +338,15 @@ function normalizeGallery(gallery: SedifexGalleryItem[]): SedifexGalleryItem[] {
     .sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER));
 }
 
+function filterServiceProducts(products: SedifexProduct[]): SedifexProduct[] {
+  const serviceProducts = products.filter((product) => {
+    const itemType = product.itemType?.toLowerCase();
+    return !itemType || itemType === "service";
+  });
+
+  return serviceProducts.length ? serviceProducts : products;
+}
+
 export async function getHomePageData(): Promise<HomePageData> {
   const { storeId } = getEnv();
 
@@ -238,12 +363,12 @@ export async function getHomePageData(): Promise<HomePageData> {
 
   try {
     const [productsResponse, promoResponse, galleryResponse] = await Promise.all([
-      fetchSedifexEndpoint(`/integrationProducts?storeId=${encodedStoreId}`),
-      fetchSedifexEndpoint(`/integrationPromo?storeId=${encodedStoreId}`),
+      fetchSedifexEndpoint(`/v1IntegrationProducts?storeId=${encodedStoreId}`),
+      fetchSedifexEndpoint(`/v1IntegrationPromo?storeId=${encodedStoreId}`),
       fetchSedifexEndpoint(`/integrationGallery?storeId=${encodedStoreId}`)
     ]);
 
-    const products = dedupeProducts(normalizeProducts(normalizeArray<SedifexProduct>(productsResponse)));
+    const products = filterServiceProducts(dedupeProducts(normalizeProducts(normalizeArray<SedifexProduct>(productsResponse))));
     const promo = normalizePromo(promoResponse);
     const gallery = normalizeGallery(normalizeArray<SedifexGalleryItem>(galleryResponse));
 

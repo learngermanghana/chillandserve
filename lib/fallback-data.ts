@@ -9,6 +9,7 @@ export const fallbackProducts: SedifexProduct[] = [
     description:
       "Signature non-alcoholic and cocktail-style drinks station curated for weddings, receptions, and upscale private events.",
     price: 1800,
+    itemType: "service",
     imageUrl:
       "https://images.unsplash.com/photo-1514361892635-6b07e31e75ef?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Elegant drinks table setup for a wedding reception"
@@ -21,6 +22,7 @@ export const fallbackProducts: SedifexProduct[] = [
     description:
       "Professional chilling stations, ice support, and beverage temperature management for all-day events.",
     price: 1300,
+    itemType: "service",
     imageUrl:
       "https://images.unsplash.com/photo-1551024709-8f23befc6cf7?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Chilled beverages ready for guests at a premium event"
@@ -33,6 +35,7 @@ export const fallbackProducts: SedifexProduct[] = [
     description:
       "Stylish cocktail setup and mixologist-led service that adds elegance and energy to birthdays and private parties.",
     price: 2200,
+    itemType: "service",
     imageUrl:
       "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Luxury cocktail glasses prepared for a special event"
@@ -45,6 +48,7 @@ export const fallbackProducts: SedifexProduct[] = [
     description:
       "Polished and courteous waiters trained for weddings, receptions, and executive events in Accra and beyond.",
     price: 950,
+    itemType: "service",
     imageUrl:
       "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Professional waiter serving guests during a premium event"
@@ -57,6 +61,7 @@ export const fallbackProducts: SedifexProduct[] = [
     description:
       "End-to-end beverage station planning including layout, logistics, and guest flow optimization.",
     price: 1600,
+    itemType: "service",
     imageUrl:
       "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Beautiful wedding beverage corner with flowers and drinks"
@@ -69,6 +74,7 @@ export const fallbackProducts: SedifexProduct[] = [
     description:
       "A complete premium beverage and guest support package designed for unforgettable wedding receptions.",
     price: 2800,
+    itemType: "service",
     imageUrl:
       "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
     imageAlt: "Elegant wedding reception party with premium service atmosphere"

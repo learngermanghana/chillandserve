@@ -8,6 +8,7 @@ export interface SedifexProduct {
   stockCount?: number;
   itemType?: string;
   imageUrl?: string;
+  imageUrls?: string[];
   imageAlt?: string;
   updatedAt?: string;
 }

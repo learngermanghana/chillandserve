@@ -16,6 +16,7 @@ Create a `.env.local` file in the project root:
 ```bash
 SEDIFEX_API_BASE_URL=
 SEDIFEX_STORE_ID=
+SEDIFEX_INTEGRATION_API_KEY=
 SEDIFEX_INTEGRATION_KEY=
 NEXT_PUBLIC_SITE_URL=
 ```
@@ -50,7 +51,9 @@ npm run start
 3. Set these Environment Variables in Vercel project settings:
    - `SEDIFEX_API_BASE_URL`
    - `SEDIFEX_STORE_ID`
-   - `SEDIFEX_INTEGRATION_KEY`
+   - `SEDIFEX_INTEGRATION_API_KEY` (preferred)
+   - `SEDIFEX_INTEGRATION_KEY` (legacy fallback)
+   - `SEDIFEX_CONTRACT_VERSION` (defaults to `2026-04-13`)
    - `NEXT_PUBLIC_SITE_URL`
 4. Deploy.
 
@@ -58,13 +61,14 @@ npm run start
 
 Data is fetched server-side from:
 
-- `GET /integrationProducts?storeId=<storeId>`
-- `GET /integrationPromo?storeId=<storeId>`
+- `GET /v1IntegrationProducts?storeId=<storeId>`
+- `GET /v1IntegrationPromo?storeId=<storeId>`
 - `GET /integrationGallery?storeId=<storeId>`
 
 The app sends:
 
-- `Authorization: Bearer <integration_key>`
+- `x-api-key: <integration_key>`
+- `X-Sedifex-Contract-Version: <contract_version_header>`
 
 Data logic is implemented in:
 
