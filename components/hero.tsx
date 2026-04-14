@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { BRAND_NAME, PHONE_DISPLAY, PHONE_LINK, WHATSAPP_LINK } from "@/lib/constants";
 import { formatDateRange } from "@/lib/format";
@@ -50,13 +49,12 @@ export default function Hero({ promo, heroImage }: HeroProps) {
         </div>
 
         <div className="relative h-[260px] overflow-hidden rounded-3xl shadow-premium sm:h-[320px] md:h-[520px]">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={heroImage.src}
             alt={heroImage.alt}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-            priority
+            className="h-full w-full object-cover"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-charcoalBrand/50 via-transparent to-transparent" />
         </div>

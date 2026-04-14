@@ -412,8 +412,16 @@ export async function getHomePageData(): Promise<HomePageData> {
 
 export function getHeroImage(
   gallery: SedifexGalleryItem[],
-  products: SedifexProduct[]
+  products: SedifexProduct[],
+  promo?: SedifexPromo | null
 ): { src: string; alt: string } {
+  if (promo?.promoImageUrl) {
+    return {
+      src: promo.promoImageUrl,
+      alt: promo.promoImageAlt ?? "Featured event offer image from Chill and Serve Ghana"
+    };
+  }
+
   const galleryFirst = gallery.find((item) => item.url);
   if (galleryFirst?.url) {
     return {

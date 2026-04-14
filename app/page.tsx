@@ -8,7 +8,7 @@ import { getLatestYouTubeVideos } from "@/lib/youtube";
 
 export default async function HomePage() {
   const { products, promo, gallery } = await getHomePageData();
-  const heroImage = getHeroImage(gallery, products);
+  const heroImage = getHeroImage(gallery, products, promo);
   const latestVideos = await getLatestYouTubeVideos(promo?.promoYoutubeChannelId);
 
   return (

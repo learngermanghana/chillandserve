@@ -9,6 +9,8 @@ interface ServicesGridProps {
 }
 
 export default function ServicesGrid({ products }: ServicesGridProps) {
+  const descriptionPreviewLength = 120;
+
   return (
     <section id="services" className="bg-ivoryBrand py-16 md:py-24">
       <div className="container mx-auto max-w-7xl px-4 md:px-8">
@@ -38,9 +40,25 @@ export default function ServicesGrid({ products }: ServicesGridProps) {
                   {product.category || "Event Service"}
                 </p>
                 <h3 className="text-xl font-semibold text-charcoalBrand">{product.name || "Custom Event Package"}</h3>
-                <p className="text-sm leading-relaxed text-charcoalBrand/75">
-                  {product.description || "Tailored support designed for premium guest experience."}
-                </p>
+                {(() => {
+                  const fullDescription = product.description || "Tailored support designed for premium guest experience.";
+                  const shouldCollapse = fullDescription.length > descriptionPreviewLength;
+                  const preview = shouldCollapse ? `${fullDescription.slice(0, descriptionPreviewLength).trimEnd()}…` : fullDescription;
+
+                  if (!shouldCollapse) {
+                    return <p className="text-sm leading-relaxed text-charcoalBrand/75">{fullDescription}</p>;
+                  }
+
+                  return (
+                    <details className="group text-sm leading-relaxed text-charcoalBrand/75">
+                      <summary className="list-none cursor-pointer select-none marker:hidden">
+                        {preview} <span className="font-medium text-emeraldBrand group-open:hidden">View more</span>
+                        <span className="hidden font-medium text-emeraldBrand group-open:inline">View less</span>
+                      </summary>
+                      <p className="mt-2">{fullDescription}</p>
+                    </details>
+                  );
+                })()}
                 <div className="flex items-center justify-between gap-3 border-t border-charcoalBrand/10 pt-4">
                   <Link
                     href={WHATSAPP_LINK}

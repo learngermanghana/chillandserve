@@ -1,4 +1,3 @@
-import Image from "next/image";
 import SectionHeading from "./section-heading";
 import { SedifexGalleryItem } from "@/lib/types";
 
@@ -21,12 +20,12 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
           {items.map((item, idx) => (
             <figure key={`${item.url ?? idx}-${idx}`} className="group mb-4 overflow-hidden rounded-2xl bg-white shadow-premium">
               <div className="relative min-h-60 w-full">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={item.url || "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1000&q=80"}
                   alt={item.alt || "Elegant drinks service setup for an event in Ghana"}
-                  width={900}
-                  height={700}
                   className="h-auto w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                  loading="lazy"
                 />
               </div>
               {item.caption ? <figcaption className="px-4 py-3 text-sm text-charcoalBrand/80">{item.caption}</figcaption> : null}
