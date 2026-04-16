@@ -2,7 +2,9 @@ import { FALLBACK_HERO_IMAGE } from "./constants";
 import { fallbackGallery, fallbackProducts, fallbackPromo } from "./fallback-data";
 import { HomePageData, SedifexGalleryItem, SedifexProduct, SedifexPromo } from "./types";
 
-const REVALIDATE_SECONDS = 60;
+const PRODUCTS_REVALIDATE_SECONDS = 30;
+const PROMO_REVALIDATE_SECONDS = 60;
+const GALLERY_REVALIDATE_SECONDS = 60;
 const DEFAULT_CONTRACT_VERSION = "2026-04-13";
 
 function getEnv() {
@@ -163,6 +165,18 @@ function normalizeArray<T>(value: unknown): T[] {
   return [];
 }
 
+function getFetchConfig(path: string): { revalidate: number } {
+  if (path.startsWith("/v1IntegrationProducts")) {
+    return { revalidate: PRODUCTS_REVALIDATE_SECONDS };
+  }
+
+  if (path.startsWith("/v1IntegrationPromo") || path.startsWith("/integrationGallery")) {
+    return { revalidate: PROMO_REVALIDATE_SECONDS };
+  }
+
+  return { revalidate: GALLERY_REVALIDATE_SECONDS };
+}
+
 async function fetchSedifexEndpoint(path: string): Promise<unknown> {
   const { baseUrl, integrationKey, contractVersion } = getEnv();
 
@@ -177,7 +191,7 @@ async function fetchSedifexEndpoint(path: string): Promise<unknown> {
       "X-Sedifex-Contract-Version": contractVersion,
       Accept: "application/json"
     },
-    next: { revalidate: REVALIDATE_SECONDS }
+    next: getFetchConfig(path)
   });
 
   if (!response.ok) {
@@ -322,7 +336,7 @@ function dedupeProducts(products: SedifexProduct[]): SedifexProduct[] {
   const seen = new Set<string>();
 
   return products.filter((product) => {
-    const key = `${product.id ?? ""}|${product.storeId ?? ""}|${product.name ?? ""}|${product.price ?? ""}`;
+    const key = `${product.id ?? ""}|${product.updatedAt ?? ""}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

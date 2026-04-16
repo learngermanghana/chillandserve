@@ -50,3 +50,23 @@ export interface HomePageData {
   gallery: SedifexGalleryItem[];
   usingFallback: boolean;
 }
+
+export interface IntegrationBookingCustomer {
+  name?: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface IntegrationBooking {
+  id?: string;
+  storeId?: string;
+  serviceId?: string;
+  slotId?: string;
+  status?: string;
+  quantity?: number;
+  customer?: IntegrationBookingCustomer;
+  notes?: string;
+  attributes?: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+}

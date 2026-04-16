@@ -65,6 +65,11 @@ Data is fetched server-side from:
 - `GET /v1IntegrationPromo?storeId=<storeId>`
 - `GET /integrationGallery?storeId=<storeId>`
 
+Bookings are proxied through an internal Next.js route:
+
+- `GET /api/bookings?status=<status>&serviceId=<serviceId>` → `GET /v1IntegrationBookings?storeId=<storeId>&status=<status>&serviceId=<serviceId>`
+- `POST /api/bookings` → `POST /v1IntegrationBookings?storeId=<storeId>`
+
 The app sends:
 
 - `x-api-key: <integration_key>`
@@ -74,14 +79,17 @@ Data logic is implemented in:
 
 - `lib/sedifex.ts`
 
-with `next: { revalidate: 60 }` for periodic freshness.
+with route-specific revalidation:
+
+- products: `revalidate: 30`
+- promo/gallery: `revalidate: 60`
 
 ## Fallback Data Behavior
 
 If Sedifex credentials are missing, endpoint requests fail, or payloads are incomplete:
 
 - the homepage still renders with curated premium fallback content from `lib/fallback-data.ts`
-- products are deduplicated using `id|storeId|name|price`
+- products are deduplicated using `id|updatedAt`
 - gallery items are filtered by publication status and sorted by `sortOrder`
 
 This ensures stable and reliable rendering in production environments.
