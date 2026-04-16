@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import type { IntegrationBooking } from "@/lib/types";
 
 const inputClass =
@@ -29,6 +29,8 @@ const initialForm = {
 
 export default function BookingForm() {
   const [form, setForm] = useState(initialForm);
+  const [availableServices, setAvailableServices] = useState<Array<{ id: string; name: string }>>([]);
+  const [loadingServices, setLoadingServices] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
   const [bookings, setBookings] = useState<IntegrationBooking[]>([]);
@@ -37,6 +39,41 @@ export default function BookingForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [lastRequestId, setLastRequestId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoadingServices(true);
+
+      try {
+        const response = await fetch("/api/services", { method: "GET", cache: "no-store" });
+        const payload = (await response.json()) as {
+          services?: Array<{ id: string; name: string }>;
+          error?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "Failed to load services.");
+        }
+
+        const services = payload.services ?? [];
+        setAvailableServices(services);
+
+        if (services.length > 0) {
+          const firstService = services[0];
+          setForm((prev) => {
+            if (prev.serviceId) return prev;
+            return { ...prev, serviceId: firstService.id, service: firstService.name };
+          });
+        }
+      } catch (fetchError) {
+        setError(fetchError instanceof Error ? fetchError.message : "Failed to load services.");
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    void fetchServices();
+  }, []);
 
   const bookingPayload = useMemo(
     () => ({
@@ -155,13 +192,35 @@ export default function BookingForm() {
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
-                Service label
-                <input className={inputClass} value={form.service} onChange={(event) => setForm((prev) => ({ ...prev, service: event.target.value }))} />
+                Service (required)
+                <select
+                  className={inputClass}
+                  value={form.serviceId}
+                  onChange={(event) => {
+                    const selectedId = event.target.value;
+                    const selectedService = availableServices.find((service) => service.id === selectedId);
+                    setForm((prev) => ({
+                      ...prev,
+                      serviceId: selectedId,
+                      service: selectedService?.name ?? prev.service
+                    }));
+                  }}
+                  required
+                >
+                  {availableServices.length === 0 ? (
+                    <option value="">{loadingServices ? "Loading services..." : "No services available"}</option>
+                  ) : null}
+                  {availableServices.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.name}
+                    </option>
+                  ))}
+                </select>
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
-                Service ID (required)
-                <input className={inputClass} value={form.serviceId} onChange={(event) => setForm((prev) => ({ ...prev, serviceId: event.target.value }))} required />
+                Service ID (auto-selected)
+                <input className={inputClass} value={form.serviceId} readOnly />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
