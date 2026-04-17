@@ -14,13 +14,16 @@ const initialForm = {
   service: "Event Serving Staff",
   serviceId: "",
   slotId: "",
-  event_date: "2026-04-20",
-  start_time: "18:00",
-  venue: "East Legon, Accra",
-  guest_count: 50,
-  contact_method: "WhatsApp",
-  deposit_amount: 300,
-  payment_method: "Mobile Money",
+  eventDate: "2026-04-20",
+  bookingTime: "18:00",
+  eventLocation: "East Legon, Accra",
+  customerStayLocation: "",
+  guestCount: 50,
+  contactMethod: "WhatsApp",
+  paymentAmount: 300,
+  paymentMethod: "Mobile Money",
+  branchLocationId: "",
+  branchLocationName: "",
   payment_name: "Jane Doe",
   payment_number: "0541234567",
   notes: "Please arrive 1 hour before the event starts",
@@ -77,28 +80,36 @@ export default function BookingForm() {
 
   const bookingPayload = useMemo(
     () => ({
-      serviceId: form.serviceId,
+      serviceId: form.serviceId || undefined,
       slotId: form.slotId || undefined,
       customer: {
         name: form.name || undefined,
         phone: form.phone || undefined,
         email: form.email || undefined
       },
+      customerName: form.name || undefined,
+      customerPhone: form.phone || undefined,
+      customerEmail: form.email || undefined,
+      serviceName: form.service || undefined,
+      bookingDate: form.eventDate || undefined,
+      bookingTime: form.bookingTime || undefined,
+      branchLocationId: form.branchLocationId || undefined,
+      branchLocationName: form.branchLocationName || undefined,
+      eventLocation: form.eventLocation || undefined,
+      customerStayLocation: form.customerStayLocation || undefined,
+      paymentMethod: form.paymentMethod || undefined,
+      paymentAmount: form.paymentAmount || undefined,
+      depositAmount: form.paymentAmount || undefined,
       quantity: 1,
       notes: form.notes || undefined,
       attributes: {
         occasion: form.occasion,
-        service: form.service,
-        event_date: form.event_date,
-        start_time: form.start_time,
-        venue: form.venue,
-        guest_count: form.guest_count,
-        contact_method: form.contact_method,
-        deposit_amount: form.deposit_amount,
-        payment_method: form.payment_method,
+        contact_method: form.contactMethod,
+        guest_count: form.guestCount,
         payment_name: form.payment_name,
         payment_number: form.payment_number,
-        terms_accepted: form.terms_accepted
+        terms_accepted: form.terms_accepted,
+        source: "website_booking_form"
       }
     }),
     [form]
@@ -235,17 +246,27 @@ export default function BookingForm() {
 
               <label className="text-sm font-medium text-charcoalBrand/90">
                 Event Date
-                <input className={inputClass} type="date" value={form.event_date} onChange={(event) => setForm((prev) => ({ ...prev, event_date: event.target.value }))} />
+                <input className={inputClass} type="date" value={form.eventDate} onChange={(event) => setForm((prev) => ({ ...prev, eventDate: event.target.value }))} />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
                 Start Time
-                <input className={inputClass} type="time" value={form.start_time} onChange={(event) => setForm((prev) => ({ ...prev, start_time: event.target.value }))} />
+                <input className={inputClass} type="time" value={form.bookingTime} onChange={(event) => setForm((prev) => ({ ...prev, bookingTime: event.target.value }))} />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
                 Venue
-                <input className={inputClass} value={form.venue} onChange={(event) => setForm((prev) => ({ ...prev, venue: event.target.value }))} />
+                <input className={inputClass} value={form.eventLocation} onChange={(event) => setForm((prev) => ({ ...prev, eventLocation: event.target.value }))} />
+              </label>
+
+              <label className="text-sm font-medium text-charcoalBrand/90">
+                Where customer is staying
+                <input
+                  className={inputClass}
+                  value={form.customerStayLocation}
+                  onChange={(event) => setForm((prev) => ({ ...prev, customerStayLocation: event.target.value }))}
+                  placeholder="Optional"
+                />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
@@ -254,31 +275,51 @@ export default function BookingForm() {
                   className={inputClass}
                   type="number"
                   min={1}
-                  value={form.guest_count}
-                  onChange={(event) => setForm((prev) => ({ ...prev, guest_count: Number(event.target.value) || 1 }))}
+                  value={form.guestCount}
+                  onChange={(event) => setForm((prev) => ({ ...prev, guestCount: Number(event.target.value) || 1 }))}
                 />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
                 Contact Method
-                <input className={inputClass} value={form.contact_method} onChange={(event) => setForm((prev) => ({ ...prev, contact_method: event.target.value }))} />
+                <input className={inputClass} value={form.contactMethod} onChange={(event) => setForm((prev) => ({ ...prev, contactMethod: event.target.value }))} />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
-                Deposit Amount
+                Branch Location ID
+                <input
+                  className={inputClass}
+                  value={form.branchLocationId}
+                  onChange={(event) => setForm((prev) => ({ ...prev, branchLocationId: event.target.value }))}
+                  placeholder="Optional"
+                />
+              </label>
+
+              <label className="text-sm font-medium text-charcoalBrand/90">
+                Branch Name
+                <input
+                  className={inputClass}
+                  value={form.branchLocationName}
+                  onChange={(event) => setForm((prev) => ({ ...prev, branchLocationName: event.target.value }))}
+                  placeholder="Optional"
+                />
+              </label>
+
+              <label className="text-sm font-medium text-charcoalBrand/90">
+                Payment Amount
                 <input
                   className={inputClass}
                   type="number"
                   min={0}
                   step="0.01"
-                  value={form.deposit_amount}
-                  onChange={(event) => setForm((prev) => ({ ...prev, deposit_amount: Number(event.target.value) || 0 }))}
+                  value={form.paymentAmount}
+                  onChange={(event) => setForm((prev) => ({ ...prev, paymentAmount: Number(event.target.value) || 0 }))}
                 />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">
                 Payment Method
-                <input className={inputClass} value={form.payment_method} onChange={(event) => setForm((prev) => ({ ...prev, payment_method: event.target.value }))} />
+                <input className={inputClass} value={form.paymentMethod} onChange={(event) => setForm((prev) => ({ ...prev, paymentMethod: event.target.value }))} />
               </label>
 
               <label className="text-sm font-medium text-charcoalBrand/90">

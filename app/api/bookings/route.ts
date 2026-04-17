@@ -7,11 +7,27 @@ const MAX_GET_RETRIES = 3;
 type BookingRequestBody = {
   serviceId?: string;
   slotId?: string;
+  slotID?: string;
+  slot_id?: string;
   customer?: {
     name?: string;
     phone?: string;
     email?: string;
   };
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  serviceName?: string;
+  bookingDate?: string;
+  bookingTime?: string;
+  branchLocationId?: string;
+  branchLocationName?: string;
+  eventLocation?: string;
+  customerStayLocation?: string;
+  paymentMethod?: string;
+  paymentAmount?: number;
+  preferredBranch?: string;
+  depositAmount?: number;
   quantity?: number;
   notes?: string;
   attributes?: Record<string, unknown>;
@@ -151,15 +167,29 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => null)) as BookingRequestBody | null;
-
-  if (!body?.serviceId) {
-    return NextResponse.json({ error: "serviceId is required." }, { status: 400 });
+  if (!body) {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const hasCustomerField = Boolean(body.customer?.name || body.customer?.phone || body.customer?.email);
+  const slotId = body.slotId ?? body.slotID ?? body.slot_id;
+
+  const hasCustomerField = Boolean(
+    body.customer?.name ||
+      body.customer?.phone ||
+      body.customer?.email ||
+      body.customerName ||
+      body.customerPhone ||
+      body.customerEmail
+  );
   if (!hasCustomerField) {
     return NextResponse.json({ error: "At least one customer field (name, phone, or email) is required." }, { status: 400 });
   }
+
+  const customer = {
+    name: body.customer?.name ?? body.customerName,
+    phone: body.customer?.phone ?? body.customerPhone,
+    email: body.customer?.email ?? body.customerEmail
+  };
 
   const endpoint = `${cleanBaseUrl(baseUrl)}/v1IntegrationBookings?storeId=${encodeURIComponent(storeId)}`;
 
@@ -173,8 +203,22 @@ export async function POST(request: NextRequest) {
     },
     body: JSON.stringify({
       serviceId: body.serviceId,
-      slotId: body.slotId,
-      customer: body.customer,
+      slotId,
+      customer,
+      customerName: body.customerName,
+      customerPhone: body.customerPhone,
+      customerEmail: body.customerEmail,
+      serviceName: body.serviceName,
+      bookingDate: body.bookingDate,
+      bookingTime: body.bookingTime,
+      branchLocationId: body.branchLocationId,
+      branchLocationName: body.branchLocationName,
+      eventLocation: body.eventLocation,
+      customerStayLocation: body.customerStayLocation,
+      paymentMethod: body.paymentMethod,
+      paymentAmount: body.paymentAmount,
+      preferredBranch: body.preferredBranch,
+      depositAmount: body.depositAmount,
       quantity: body.quantity ?? 1,
       notes: body.notes,
       attributes: body.attributes ?? {}
